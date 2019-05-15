@@ -1,0 +1,7 @@
+1. add constants
+2. add avaible functions as header in comment
+3. wrap snake body
+    - create snake move
+    - change length of snake, when snake.length changes
+4. no random break for fruit spawn
+5. create documentation
