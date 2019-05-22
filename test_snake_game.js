@@ -21,7 +21,8 @@ const color = GREEN
 // Snake characteristics
 const snake = {
     head: {x: width/2, y: height/2},
-    color: "yellow",
+    head_color: "yellow",
+    body_color: "blue",
     length: 3,
     body: [
         {x: width / 2, y: height / 2},
@@ -37,9 +38,6 @@ const fruit = {
     position: {x:0, y: 0},
     color: "red",
 }
-
-// set the fruit's position
-
 
 // -------------------------
 // ------- FUNCTIONS -------
@@ -58,7 +56,7 @@ function loop() {
         spawn_fruit()
         move_snake()
         const fruit_eaten = eat_fruit()
-        manage_body(snake, fruit_eaten)
+        snake_body_movement(snake, fruit_eaten)
     }
 }
 
@@ -80,7 +78,8 @@ function onKeyDown(key_pressed) {
 
 // --- Functions that they will have to do ---
 
-//fruit
+// Handle the Fruit
+
 function draw_fruit() {
     if (fruit.spawned === true) {
         draw_square(fruit.position.x, fruit.position.y, fruit.color, "green")
@@ -97,7 +96,7 @@ function spawn_fruit() {
 
 // Handle the movement of the snake
 function draw_snake() {
-    draw_square(snake.head.x, snake.head.y, snake.color, "green")
+    draw_square(snake.head.x, snake.head.y, snake.head_color, "green")
     draw_snake_body(snake)
 }
 

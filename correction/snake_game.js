@@ -4,7 +4,7 @@
 // --------------------------------
 
 // size of square tiles in pixels
-const SQUARE_SIZE = 20;
+const SQUARE_SIZE = 20
 
 // Informations about the game status
 const game = {
@@ -14,37 +14,30 @@ const game = {
 }
 
 // Game boards characteristcs
-const width = 24;
-const height = 24;
-const background_color = "#78AB46";
+const width = 24
+const height = 24
+const color = GREEN
 
 // Snake characteristics
-let snake = {
-    color: "yellow",
-    positions: [
-        { x: width / 2, y: height / 2 },
-        { x: width / 2 - 1, y: height / 2 },
-        { x: width / 2 - 2, y: height / 2 }
+const snake = {
+    head: {x: width/2, y: height/2},
+    head_color: "yellow",
+    body_color: "blue",
+    length: 3,
+    body: [
+        {x: width / 2, y: height / 2},
+        {x: width / 2 - 1, y: height / 2},
+        {x: width / 2 - 2, y: height / 2},
     ],
-    direction: "west"
-};
-
-// set the fruit's position
-const fruit = {
-    show: false,
-    x: -1,
-    y: -1
+    direction: RIGHT
 }
 
-const colors = [
-    "#ffe900",
-    "#FFC300",
-    "#FF5733",
-    "#C70039",
-    "#581845",
-    "#C70039",
-    "#FF5733",
-]
+//fruit
+const fruit = {
+    spawned: false,
+    position: {x:0, y: 0},
+    color: "red",
+}
 
 // -------------------------
 // ------- FUNCTIONS -------
@@ -52,131 +45,99 @@ const colors = [
 
 // Main Drawing function, you should put all of the things that you want to draw in this function
 function draw() {
-    draw_board(width, height, background_color);
-
-    draw_fruit(fruit);
-    draw_snake(snake);
+    draw_board(width, height, color)
+    draw_fruit()
+    draw_snake()
 }
 
 // Main loop function, this function is called every "game.speed" milliseconds.
 function loop() {
-    if (game.status === "playing") {
-        move_snake(snake, width, height);
-        handle_interaction(snake, fruit, game);
-        randomly_spawn_fruit(fruit, width, height);
-        print_score(game.score);
+    if (game.status == "playing") {
+        spawn_fruit()
+        move_snake()
+        const fruit_eaten = eat_fruit()
+        snake_body_movement(snake, fruit_eaten)
     }
 }
 
 // This function is called when a key is pressed
 function onKeyDown(key_pressed) {
-    console.log(key_pressed);
-    if (key_pressed === "ArrowRight" && snake.direction !== "east") {
-        snake.direction = "west"
+    if (key_pressed === ARROW_UP && snake.direction !== DOWN) {
+        snake.direction = UP
     }
-    if (key_pressed === "ArrowLeft" && snake.direction !== "west") {
-        snake.direction = "east"
+    if (key_pressed === ARROW_RIGHT && snake.direction !== LEFT) {
+        snake.direction = RIGHT
     }
-    if (key_pressed === "ArrowDown" && snake.direction !== "north") {
-        snake.direction = "south"
+    if (key_pressed === ARROW_DOWN && snake.direction !== UP) {
+        snake.direction = DOWN
     }
-    if (key_pressed === "ArrowUp" && snake.direction !== "south") {
-        snake.direction = "north"
+    if (key_pressed === ARROW_LEFT && snake.direction !== RIGHT) {
+        snake.direction = LEFT
     }
 }
 
 // --- Functions that they will have to do ---
 
+// Handle the Fruit
+
+function draw_fruit() {
+    if (fruit.spawned === true) {
+        draw_square(fruit.position.x, fruit.position.y, fruit.color, "green")
+    }
+}
+
+function spawn_fruit() {
+    if (fruit.spawned === false) {
+        fruit.position.x = get_random_number(0, width - 1)
+        fruit.position.y = get_random_number(0, height - 1)
+        fruit.spawned = true
+    }
+}
+
 // Handle the movement of the snake
-function move_snake(snake, width, height) {
-    const head = snake.positions[0];
-
-    if (snake.direction === "west") {
-        if (head.x + 1 === width)
-            add_block_to_snake_head({ x: 0, y: head.y })
-        else
-            add_block_to_snake_head({ x: head.x + 1, y: head.y })
-    }
-    if (snake.direction === "east") {
-        if (head.x - 1 < 0)
-            add_block_to_snake_head({ x: width - 1, y: head.y })
-        else
-            add_block_to_snake_head({ x: head.x - 1, y: head.y })
-    }
-    if (snake.direction === "south") {
-        if (head.y + 1 === height)
-            add_block_to_snake_head({ x: head.x, y: 0 })
-        else
-            add_block_to_snake_head({ x: head.x, y: head.y + 1 })
-    }
-    if (snake.direction === "north") {
-        if (head.y - 1 < 0) 
-            add_block_to_snake_head({ x: head.x, y: height - 1 })
-        else
-            add_block_to_snake_head({ x: head.x, y: head.y - 1 })
-    }
+function draw_snake() {
+    draw_square(snake.head.x, snake.head.y, snake.head_color, "green")
+    draw_snake_body(snake)
 }
 
-function handle_interaction(snake, fruit, game) {
-    if (did_snake_bite_itself(snake) === true) {
-        game.status = "stop"
-        show_game_over();
-        prompt("Enter your username")
-    }
-    if (did_snake_eat_fruit(snake, fruit, game) === true) {
-        game.score = game.score + 10;
-        // game.speed = game.speed - 10;
-        fruit.show = false;
-    } else {
-        remove_last_snake_block(); // remove tail
-    }
-}
-
-function draw_snake(snake) {
-    const length = snake.positions.length;
-    let i = 0;
-    while (i < length) {
-        const position = snake.positions[i];
-        let color_index = i % colors.length;
-        draw_square(position.x, position.y, i === 0 ? snake.color : colors[color_index]);
-        i = i + 1;
-    }
-}
-
-function draw_fruit(fruit) {
-    if (fruit.show === true) {
-        draw_square(fruit.x, fruit.y, "red");
-    }
-}
-
-function did_snake_eat_fruit(snake, fruit) {
-    const snake_head = snake.positions[0];
-    if (fruit.show === true && snake_head.x === fruit.x && snake_head.y === fruit.y) {
-        return true;
-    }
-    return false;
-}
-
-function did_snake_bite_itself(snake) {
-    const head = snake.positions[0];
-    const length = snake.positions.length;
-    let i = 1;
-    while (i < length) {
-        const position = snake.positions[i];
-        if (head.x === position.x && head.y === position.y)
-            return true;
-        i = i + 1;
-    }
-    return false;
-}
-
-function randomly_spawn_fruit(fruit, width, height) {
-    if (fruit.show === false) {
-        const random = get_random_number(0, 5);
-        if (random === 0) {
-            fruit.show = true;
-            fruit.x = get_random_number(0, width - 1);
-            fruit.y = get_random_number(0, height - 1);
+function move_snake() {
+    if (snake.direction === UP) {
+        if (snake.head.y !== 0) {
+            snake.head.y = snake.head.y - 1
+        } else {
+            snake.head.y = height - 1
         }
     }
+    if (snake.direction === RIGHT) {
+        if (snake.head.x !== width - 1) {
+            snake.head.x = snake.head.x + 1
+        } else {
+            snake.head.x = 0
+        }
+    }
+    if (snake.direction === DOWN) {
+        if (snake.head.y !== height - 1) {
+            snake.head.y = snake.head.y + 1
+        } else {
+            snake.head.y = 0
+        }
+    }
+    if (snake.direction === LEFT) {
+        if (snake.head.x !== 0) {
+            snake.head.x = snake.head.x - 1
+        } else {
+            snake.head.x = width - 1
+        }
+    }
+}
+
+function eat_fruit() {
+    if (snake.head.x === fruit.position.x && snake.head.y === fruit.position.y) {
+        fruit.spawned = false
+        game.score = game.score + 10
+        print_score(game.score)
+        snake.length = snake.length + 1
+        return (true)
+    }
+    return (false)
 }

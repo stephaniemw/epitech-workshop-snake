@@ -19,7 +19,7 @@ const game = {
 // Snake characteristics
 
 
-// set the fruit's position
+// fruit object
 
 
 // -------------------------
@@ -43,4 +43,6 @@ function onKeyDown(key_pressed) {
 
 // --- Functions that they will have to do ---
 
-// Handle the movement of the snake
+// Handle the snake
+
+// Handle the fruit

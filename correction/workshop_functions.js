@@ -1,5 +1,3 @@
-// var keyPressedHandled = false;
-
 function draw_board(width, height, fillColor) {
     const size = SQUARE_SIZE || 20
 
@@ -7,26 +5,21 @@ function draw_board(width, height, fillColor) {
     gameBoard.canvas.width =  width * size;
     gameBoard.canvas.height = height * size;
     gameBoard.fillStyle = fillColor;
-    // gameBoard.strokeStyle =  borderColor;
-    // gameBoard.lineWidth = 5;
     gameBoard.fillRect(0, 0, width * size, height * size);
-    // gameBoard.strokeRect(0, 0, width, height);
 }
 
-function draw_square(top, left, fillColor, borderColor) {
+function draw_square(left, top, fillColor, borderColor) {
     const size = SQUARE_SIZE || 20
-    // if (SQUARE_SIZE)
     const gameBoard = document.getElementById("gameBoard").getContext("2d");
     gameBoard.fillStyle = fillColor;
     gameBoard.strokeStyle = borderColor;
     gameBoard.lineWidth = 0.2;
-    gameBoard.fillRect(top * size, left * size, size, size);
-    gameBoard.strokeRect(top * size, left * size, size, size);
+    gameBoard.fillRect(left * size, top * size, size, size);
+    gameBoard.strokeRect(left * size, top * size, size, size);
 }
 
 function loop(speed, callback) {
     setTimeout(function onTick() {
-        // console.log("tick");
         callback();
         loop(speed, callback);
      }, speed)
@@ -35,19 +28,10 @@ function loop(speed, callback) {
 function print_score(score) {
     const scoreDiv = document.getElementById("score");
     scoreDiv.innerHTML = score;
-
 }
 
 function get_random_number(min, max) {
     return Math.floor(Math.random() * max) + min;
-}
-
-function add_block_to_snake_head(block) {
-    snake.positions.unshift(block)
-}
-
-function remove_last_snake_block() {
-    snake.positions.pop();
 }
 
 function show_game_over() {
@@ -72,9 +56,7 @@ function init(){
     window.requestAnimationFrame(game_loop);
     document.addEventListener("keydown", (event) => {
         event.preventDefault();
-        // if (!keyPressedHandled)
             onKeyDown(event.code);
-        // keyPressedHandled = true;
     });
 }
 
@@ -89,14 +71,42 @@ function game_loop(timeStamp) {
     }
     const speed = game && game.speed ? game.speed : 100;
     if (accumulator >  speed) {
-        console.log("tick")
         accumulator = 0;
         loop();
-        // keyPressedHandled = false;
     }
 
     draw();
 
     // Keep requesting new frames
     window.requestAnimationFrame(game_loop);
+}
+
+//body
+
+function snake_body_movement(snake, fruit_eaten) {
+    snake.body.unshift({x: snake.head.x, y: snake.head.y})
+    if (fruit_eaten === true) {
+        snake.body.pop()
+    }
+    if (snake_bite_body(snake) === true) {
+        game.status = "stop"
+        show_game_over();
+    }
+}
+
+function snake_bite_body(snake)
+{
+    for (var i = 1; i < snake.length; i += 1) {
+        if (snake.body[i].x === snake.head.x && snake.body[i].y === snake.head.y) {
+            return (true)
+        }
+    }
+    return (false)
+}
+
+function draw_snake_body(snake)
+{
+    for (var i = 1; i < snake.length; i += 1) {
+        draw_square(snake.body[i].x, snake.body[i].y, snake.body_color, GREEN)
+    }
 }
