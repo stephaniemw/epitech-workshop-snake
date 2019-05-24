@@ -85,10 +85,10 @@ function game_loop(timeStamp) {
 
 function snake_body_movement(snake_body, snake_length, snake_head, fruit_eaten) {
     snake_body.unshift({x: snake_head.x, y: snake_head.y})
-    if (fruit_eaten === true) {
+    if (fruit_eaten === false) {
         snake_body.pop()
     }
-    if (snake_bite_body(snake_body, snake_head, snake_length) == true) {
+    if (snake_bite_body(snake_body, snake_head, snake_length) === true) {
         game.status = "stop"
         show_game_over();
     }
