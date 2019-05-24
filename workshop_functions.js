@@ -25,10 +25,9 @@ function loop(speed, callback) {
      }, speed)
 }
 
-function print_score(score) {
+function update_score(score) {
     const scoreDiv = document.getElementById("score");
     scoreDiv.innerHTML = score;
-
 }
 
 function get_random_number(min, max) {
@@ -36,7 +35,6 @@ function get_random_number(min, max) {
 }
 
 function show_game_over() {
-    window.fetch("http://192.168.1.8:3000/scores").then((res) => res.json()).then((val) => console.log(val))
     const div = document.getElementById('game-over');
     div.style.visibility = "visible"
 }
@@ -85,30 +83,30 @@ function game_loop(timeStamp) {
 
 //body
 
-function snake_body_movement(snake, fruit_eaten) {
-    snake.body.unshift({x: snake.head.x, y: snake.head.y})
+function snake_body_movement(snake_body, snake_length, snake_head, fruit_eaten) {
+    snake_body.unshift({x: snake_head.x, y: snake_head.y})
     if (fruit_eaten === true) {
-        snake.body.pop()
+        snake_body.pop()
     }
-    if (snake_bite_body(snake) == true) {
+    if (snake_bite_body(snake_body, snake_head, snake_length) == true) {
         game.status = "stop"
         show_game_over();
     }
 }
 
-function snake_bite_body(snake)
+function snake_bite_body(snake_body, snake_head, snake_length)
 {
-    for (var i = 1; i < snake.length; i += 1) {
-        if (snake.body[i].x === snake.head.x && snake.body[i].y === snake.head.y) {
+    for (var i = 1; i < snake_length; i += 1) {
+        if (snake_body[i].x === snake_head.x && snake_body[i].y === snake_head.y) {
             return (true)
         }
     }
     return (false)
 }
 
-function draw_snake_body(snake)
+function draw_snake_body(snake_body, snake_length, snake_body_color)
 {
-    for (var i = 1; i < snake.length; i += 1) {
-        draw_square(snake.body[i].x, snake.body[i].y, snake.body_color, GREEN)
+    for (var i = 1; i < snake_length; i += 1) {
+        draw_square(snake_body[i].x, snake_body[i].y, snake_body_color, GREEN)
     }
 }
